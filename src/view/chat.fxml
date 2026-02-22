@@ -1,0 +1,18 @@
+<BorderPane>
+
+    <center>
+        <TextArea fx:id="chatArea"/>
+    </center>
+
+    <right>
+        <ListView fx:id="userList"/>
+    </right>
+
+    <bottom>
+        <HBox>
+            <TextField fx:id="messageField"/>
+            <Button text="Envoyer" onAction="#handleSend"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>
