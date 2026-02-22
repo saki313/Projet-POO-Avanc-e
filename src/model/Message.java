@@ -3,7 +3,7 @@ package model;
 public class Message {
     private String content;
     private String sender;
-    private MessageType type;
+    private MessageType.Type type;
 
     public Message(String content, String sender) {
         this.content = content;

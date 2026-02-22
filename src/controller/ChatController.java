@@ -19,7 +19,7 @@ public class ChatController {
 
     @FXML
     public void initialize() {
-        client = new ChatClient(...);
+        client = new ChatClient();
     }
 
     @FXML
