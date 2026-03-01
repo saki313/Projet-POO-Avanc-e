@@ -1,19 +1,20 @@
 package network;
 
-import java.io.BufferedReader;
 // import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.function.Consumer;
+
+import model.Message;
 
 // import javafx.application.Platform;
 
 public class ChatClientConnection {
     private Socket socket;
-    private PrintWriter out;
-    private BufferedReader in;
-    private Consumer<String> onMessageReceived;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
+    private Consumer<Message> onMessageReceived;
     
     public ChatClientConnection() {
     }
@@ -21,8 +22,8 @@ public class ChatClientConnection {
     public void connect(String host, int port) {
         try {
             socket = new Socket(host, port);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true);
+            in = new ObjectInputStream(socket.getInputStream());
+            out = new ObjectOutputStream(socket.getOutputStream());
 
             new Thread(this::lisen).start();
         } catch (Exception e) {
@@ -31,11 +32,11 @@ public class ChatClientConnection {
     }
 
     private void lisen() {
-        String serverMsg;
         try {
-            while ((serverMsg = in.readLine()) != null) {
-                if (onMessageReceived != null) {
-                    onMessageReceived.accept(serverMsg);
+            while (true) {
+                Message msg = (Message) in.readObject();
+                if (msg != null) {
+                    onMessageReceived.accept(msg);
                 }
             }
         } catch (Exception e) {
@@ -43,11 +44,13 @@ public class ChatClientConnection {
         }
     }
 
-    public void send(String message) {
-        String msg = message.trim();
-        if (!msg.isEmpty()) {
-            if (out != null) {
-                out.println(msg);
+    public void send(Message message) {
+        if (out != null) {
+            try {
+                out.writeObject(message);
+                out.flush();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -60,7 +63,7 @@ public class ChatClientConnection {
         }
     }
 
-    public void setOnMessageReceived(Consumer<String> consumer) {
+    public void setOnMessageReceived(Consumer<Message> consumer) {
         this.onMessageReceived = consumer;
     }
 }
