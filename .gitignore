@@ -1,21 +1,2 @@
-# Dependencies
-node_modules/
-vendor/
-package-lock.json
-
-# IDE
 .vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Build outputs
-dist/
-build/
-*.class
-*.log
+.history
