@@ -1,11 +1,10 @@
 package network;
 
-// import java.io.IOException;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.function.Consumer;
-
 import model.Message;
 
 // import javafx.application.Platform;
@@ -25,13 +24,13 @@ public class ChatClientConnection {
             in = new ObjectInputStream(socket.getInputStream());
             out = new ObjectOutputStream(socket.getOutputStream());
 
-            new Thread(this::lisen).start();
-        } catch (Exception e) {
-            e.printStackTrace();
+            new Thread(this::listen).start();
+        } catch (IOException e) {
+            System.out.println(e.toString());
         }
     }
 
-    private void lisen() {
+    private void listen() {
         try {
             while (true) {
                 Message msg = (Message) in.readObject();
@@ -39,8 +38,8 @@ public class ChatClientConnection {
                     onMessageReceived.accept(msg);
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println(e.toString());
         }
     }
 
@@ -49,8 +48,8 @@ public class ChatClientConnection {
             try {
                 out.writeObject(message);
                 out.flush();
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (IOException e) {
+                System.out.println(e.toString());
             }
         }
     }
@@ -58,8 +57,8 @@ public class ChatClientConnection {
     public void closeConnection() {
         try {
             if (socket != null) socket.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println(e.toString());
         }
     }
 
