@@ -1,44 +1,50 @@
 package model;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
-
-
+import java.time.LocalTime;
 
 public class Message implements Serializable {
-    MessageType type;
-    LocalDateTime dateTime;
-    Object content;
+    private static final long serialVersionUID = 1L;
     
-    public Message(MessageType type, LocalDateTime dateTime, Object content) {
-        this.type = type;
-        this.dateTime = dateTime;
-        this.content = content;
+    private User sender;
+    private LocalTime timestamp;
+    private boolean isMine;
+    private String visibility;
+
+    public Message() {
+        this.timestamp = LocalTime.now();
+        this.sender = new User();
+        this.visibility = "public";
     }
 
-    public MessageType getType() {
-        return type;
+    public Message(User sender) {
+        this.sender = sender;
+        this.timestamp = LocalTime.now();
+        this.visibility = "public";
     }
-
-    public void setType(MessageType type) {
-        this.type = type;
-    }
-
-    public LocalDateTime getDateTime() {
-        return dateTime;
-    }
-
-    public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
-    }
-
-    public Object getContent() {
-        return content;
-    }
-
-    public void setContent(Object content) {
-        this.content = content;
-    }
-
     
+    public User getSender() {
+        return sender;
+    }
+    public void setSender(User sender) {
+        this.sender = sender;
+    }
+    public LocalTime getTimestamp() {
+        return timestamp;
+    }
+    public void setTimestamp(LocalTime timestamp) {
+        this.timestamp = timestamp;
+    }
+    public boolean isMine() {
+        return isMine;
+    }
+    public void setMine(boolean isMine) {
+        this.isMine = isMine;
+    }
+    public String getVisibility() {
+        return visibility;
+    }
+    public void setVisibility(String visibility) {
+        this.visibility = visibility;
+    }
 }
