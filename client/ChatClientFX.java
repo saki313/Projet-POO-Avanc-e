@@ -2,6 +2,8 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+
+
 import controller.ChatController;
 import ui.ChatView;
 import ui.UserListView;
@@ -17,13 +19,13 @@ public class ChatClientFX extends Application {
         root.setCenter(chatView);
 
         Scene scene = new Scene(root, 550, 450);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("Chat Client");
         
-    // --- 2. CONTRÔLEUR ---
-        new ChatController(chatView, usersView);
-
-    // --- 3. SCÈNE ET AFFICHAGE ---
+        // --- 2. CONTRÔLEUR ---
+        ChatController controller = new ChatController(chatView, usersView);
+        
+        // --- 3. SCÈNE ET AFFICHAGE ---
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Chat Client - " + controller.getUser().getName());
         primaryStage.show();
     }
 

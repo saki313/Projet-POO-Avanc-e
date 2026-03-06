@@ -1,9 +1,25 @@
 package model;
 
 public class MessageFile extends Message {
+    private static final long serialVersionUID = 1L;
+    
     private String fileName;
     private byte[] data;
 
+    public MessageFile() {
+        super();
+    }
+
+    public MessageFile(byte[] data) {
+        super();
+        this.data = data;
+    }
+
+    public MessageFile(String fileName, byte[] data) {
+        super();
+        this.fileName = fileName;
+        this.data = data;
+    }
 
     public String getFileName() {
         return fileName;
@@ -17,6 +33,4 @@ public class MessageFile extends Message {
     public void setData(byte[] data) {
         this.data = data;
     }
-
-    
 }

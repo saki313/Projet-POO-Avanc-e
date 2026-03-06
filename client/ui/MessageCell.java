@@ -33,33 +33,81 @@ public class MessageCell extends ListCell<Message> {
     }
     
     private void showTextMessage(MessageText message) {
-        VBox container = new VBox();
-        Label sender = new Label(message.getSender().getUsername());
+        VBox container = new VBox(5);
+        container.setPadding(new Insets(5));
+        
+        Label sender = new Label(message.getSender().getName());
+        sender.setStyle("-fx-font-weight: bold; -fx-font-size: 10px;");
+        
         Label contentLabel = new Label(message.getContent());
-        Label hour = new Label(message.getTimestamp().toString().substring(0, 5));
+        contentLabel.setWrapText(true);
+        contentLabel.setMaxWidth(300);
+        
+        String timeStr = String.format("%02d:%02d", 
+            message.getTimestamp().getHour(), 
+            message.getTimestamp().getMinute());
+        Label hour = new Label(timeStr);
+        hour.setStyle("-fx-font-size: 8px; -fx-text-fill: gray;");
 
         container.getChildren().addAll(sender, contentLabel, hour);
         container.setAlignment(message.isMine() ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
 
-        contentLabel.setPadding(new Insets(5, 10, 5, 10));
-        contentLabel.setStyle(message.isMine() ? "-fx-background-color: #0078FF; -fx-text-fill: white;" 
-        : "-fx-background-color: #E9E9EB; -fx-text-fill: black;");
+        contentLabel.setPadding(new Insets(8, 12, 8, 12));
+        
+        // Style de bulle amélioré
+        if (message.isMine()) {
+            contentLabel.setStyle("-fx-background-color: #0078FF; -fx-text-fill: white; " +
+                "-fx-background-radius: 15 15 0 15; -fx-font-size: 14px;");
+            container.setAlignment(Pos.CENTER_RIGHT);
+        } else {
+            contentLabel.setStyle("-fx-background-color: #E9E9EB; -fx-text-fill: black; " +
+                "-fx-background-radius: 15 15 15 0; -fx-font-size: 14px;");
+            container.setAlignment(Pos.CENTER_LEFT);
+        }
 
         setGraphic(container);
     }
    
     private void showFileMessage(MessageFile message) {
-        HBox container = new HBox();
-        Label sender = new Label(message.getSender().getUsername());
-        Label fileName = new Label(message.getFileName());
-        Button downloadButton = new Button("Download");
-        // TODO "append an icon on the button"
-
-        container.getChildren().addAll(sender, fileName, downloadButton);
+        VBox container = new VBox(5);
+        container.setPadding(new Insets(5));
+        
+        Label sender = new Label(message.getSender().getName());
+        sender.setStyle("-fx-font-weight: bold; -fx-font-size: 10px;");
+        
+        HBox fileBox = new HBox(10);
+        fileBox.setAlignment(Pos.CENTER_LEFT);
+        
+        Label fileName = new Label("📄 " + message.getFileName());
+        fileName.setStyle("-fx-font-size: 14px;");
+        
+        Button downloadButton = new Button("⬇ Télécharger");
+        downloadButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+        
+        // Action de téléchargement
+        downloadButton.setOnAction(e -> {
+            // TODO: Implémenter le téléchargement du fichier
+            System.out.println("Téléchargement de: " + message.getFileName());
+        });
+        
+        fileBox.getChildren().addAll(fileName, downloadButton);
+        
+        String timeStr = String.format("%02d:%02d", 
+            message.getTimestamp().getHour(), 
+            message.getTimestamp().getMinute());
+        Label hour = new Label(timeStr);
+        hour.setStyle("-fx-font-size: 8px; -fx-text-fill: gray;");
+        
+        container.getChildren().addAll(sender, fileBox, hour);
         container.setAlignment(message.isMine() ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+        
+        // Style pour les fichiers
+        if (message.isMine()) {
+            container.setStyle("-fx-background-color: #e3f2fd; -fx-background-radius: 10;");
+        } else {
+            container.setStyle("-fx-background-color: #f5f5f5; -fx-background-radius: 10;");
+        }
 
         setGraphic(container);
     }
-
-    // TODO "design visuel avancé des bulles" "gestion du téléchargement" "auto-scroll intelligent quand un message arrive"
-}   
+}

@@ -1,13 +1,12 @@
 package fakeServer;
 
-import java.net.ServerSocket;
-import java.net.Socket;
-
-import model.Message;
-import model.MessageText;
-
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import model.Message;
+import model.MessageFile;
+import model.MessageText;
 
 public class EchoServer {
 
@@ -40,15 +39,20 @@ public class EchoServer {
 
             while (true) {
 
-                MessageText message = (MessageText) in.readObject();
-                System.out.println("Received: " + message.getContent());
+                Message message = (Message) in.readObject();
+                if (message instanceof MessageText msgText) {
+                    System.out.println("Received: " + msgText.getContent());
+                } else {
+                    MessageFile msgFile = (MessageFile) message;
+                    System.out.println("Received file: " + msgFile.getFileName() + " (" + msgFile.getData().length + " bytes)");
+                }
 
                 out.writeObject(message);
                 out.flush();
             }
 
         } catch (Exception e) {
-            System.out.println("Client disconnected");
+            System.out.println("Client déconnecté");
         }
     }
 }

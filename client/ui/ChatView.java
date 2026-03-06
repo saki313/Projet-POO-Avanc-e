@@ -22,7 +22,7 @@ import model.User;
 public class ChatView extends BorderPane {
 
     private ListView<Message> messageListView;
-    private ObservableList<Message> messsages;
+    private ObservableList<Message> messages;  // Fixed typo
 
     private TextArea messageArea;
     private TextField inputField;
@@ -30,14 +30,13 @@ public class ChatView extends BorderPane {
     private Button sendButton;
     private Button fileButton;
 
-
     public ChatView() {
-    // Construction UI
+        // Construction UI
 
-    // ListView et Message zone V2
-        messsages = FXCollections.observableArrayList();
+        // ListView et Message zone V2
+        messages = FXCollections.observableArrayList();
 
-        messageListView = new ListView<>(messsages);
+        messageListView = new ListView<>(messages);
         messageListView.setCellFactory(list -> new MessageCell());
 
         // Zone de saisie (Bas)
@@ -54,7 +53,7 @@ public class ChatView extends BorderPane {
         bottomPanel.getChildren().addAll(fileButton, inputField, sendButton);
 
         // Assemblage
-        this.setCenter(messageArea);
+        this.setCenter(messageListView);  // Changed from messageArea to messageListView
         this.setBottom(bottomPanel);
     }
 
@@ -67,7 +66,9 @@ public class ChatView extends BorderPane {
     }
 
     public void addMessage(Message msg) {
-        messsages.add(msg); // Ajoute le message à la liste observable
+        messages.add(msg); // Ajoute le message à la liste observable
+        // Auto-scroll to bottom
+        messageListView.scrollTo(messages.size() - 1);
     }
 
     public void setOnSendAction(EventHandler<ActionEvent> handler) {
@@ -83,5 +84,4 @@ public class ChatView extends BorderPane {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setOnSendMessage'");
     }
-    
 }
