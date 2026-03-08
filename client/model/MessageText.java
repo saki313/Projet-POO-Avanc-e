@@ -1,5 +1,4 @@
 package model;
-import java.time.LocalDateTime; 
 public class MessageText extends Message {
     private static final long serialVersionUID = 1L;
     

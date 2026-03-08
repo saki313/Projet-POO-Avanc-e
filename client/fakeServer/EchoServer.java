@@ -7,6 +7,7 @@ import java.net.Socket;
 import model.Message;
 import model.MessageFile;
 import model.MessageText;
+import model.User;
 
 public class EchoServer {
 
@@ -19,7 +20,6 @@ public class EchoServer {
             while (true) {
 
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("Client connected");
 
                 // Un thread par client
                 new Thread(() -> handleClient(clientSocket)).start();
@@ -36,6 +36,9 @@ public class EchoServer {
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
         ) {
+            User user = (User) in.readObject();
+            System.out.println(user.getName() + " s'est connecté !");
+            out.writeObject(new MessageText(user.getName() + " s'est connecté !", user));
 
             while (true) {
 
@@ -53,6 +56,7 @@ public class EchoServer {
 
         } catch (Exception e) {
             System.out.println("Client déconnecté");
+            e.printStackTrace();
         }
     }
 }
