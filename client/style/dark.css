@@ -1,0 +1,161 @@
+.root {
+    -fx-background-color: #1e1e1e;
+    background-color: #1e1e1e;
+}
+.left-panel {
+    -fx-background-color: #2d2d2d;
+    background-color: #2d2d2d;
+    -fx-border-color: #3a3a3a;
+    border-color: #3a3a3a;
+}
+.center-panel {
+    -fx-background-color: #262626;
+    background-color: #262626;
+}
+.chat-header, .conversation-header {
+    -fx-background-color: #2d2d2d;
+    background-color: #2d2d2d;
+    -fx-border-color: #3a3a3a;
+    border-color: #3a3a3a;
+}
+.icon-button {
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-text-fill: white;
+}
+.search-field, .user-search-field {
+    -fx-background-color: #3a3a3a;
+    background-color: #3a3a3a;
+    -fx-text-fill: white;
+}
+.tab-pane {
+    -fx-background-color: #2d2d2d;
+    background-color: #2d2d2d;
+}
+.conversation-list, .user-listview, .message-list {
+    -fx-background-color: #2d2d2d;
+    background-color: #2d2d2d;
+}
+.contacts-separator {
+    -fx-text-fill: #00a884;
+}
+.user-list-view {
+    -fx-background-color: #2d2d2d;
+    background-color: #2d2d2d;
+    -fx-border-color: #3a3a3a;
+    border-color: #3a3a3a;
+}
+.user-list-title {
+    -fx-text-fill: #00a884;
+}
+.user-count, .user-status, .online-count, .version-label, .message-time, .file-size {
+    -fx-text-fill: #a0a0a0;
+}
+.user-name {
+    -fx-text-fill: white;
+}
+.user-avatar {
+    -fx-background-color: #6c757d;
+    background-color: #6c757d;
+}
+.user-cell-hover {
+    -fx-background-color: #3a3a3a;
+    background-color: #3a3a3a;
+}
+.user-cell-selected {
+    -fx-background-color: #3a3a3a;
+    background-color: #3a3a3a;
+    -fx-border-color: #00a884;
+    border-color: #00a884;
+}
+.avatar-group {
+    -fx-background-color: #00a884;
+    background-color: #00a884;
+}
+.avatar-private {
+    -fx-background-color: #6c757d;
+    background-color: #6c757d;
+}
+.unread-badge {
+    -fx-background-color: #00a884;
+    background-color: #00a884;
+}
+.input-area {
+    -fx-background-color: #2d2d2d;
+    background-color: #2d2d2d;
+}
+.input-field {
+    -fx-background-color: #3a3a3a;
+    background-color: #3a3a3a;
+    -fx-text-fill: white;
+}
+.emoji-button {
+    -fx-background-color: #3a3a3a;
+    background-color: #3a3a3a;
+    -fx-text-fill: white;
+    -fx-border-color: #555;
+    border-color: #555;
+}
+.file-button {
+    -fx-background-color: rgba(0,168,132,0.2);
+    background-color: rgba(0,168,132,0.2);
+    -fx-text-fill: white;
+}
+.send-button {
+    -fx-background-color: #0078FF;
+    background-color: #0078FF;
+}
+.quit-button {
+    -fx-background-color: #dc3545;
+    background-color: #dc3545;
+}
+.status-bar {
+    -fx-background-color: #2d2d2d;
+    background-color: #2d2d2d;
+    -fx-border-color: #3a3a3a;
+    border-color: #3a3a3a;
+}
+.connection-connected {
+    -fx-text-fill: #00a884;
+}
+.connection-disconnected {
+    -fx-text-fill: #dc3545;
+}
+.date-separator {
+    -fx-background-color: #3a3a3a;
+    background-color: #3a3a3a;
+    -fx-text-fill: #a0a0a0;
+}
+.message-sender {
+    -fx-text-fill: #00a884;
+}
+.message-bubble-mine {
+    -fx-background-color: #005bb5;
+    background-color: #005bb5;
+}
+.message-bubble-other {
+    -fx-background-color: #3a3a3a;
+    background-color: #3a3a3a;
+}
+.message-bubble-other-group {
+    -fx-background-color: #3a3a3a;
+    background-color: #3a3a3a;
+}
+.message-text-mine {
+    -fx-text-fill: white;
+}
+.message-text-other {
+    -fx-text-fill: white;
+}
+.file-message-mine {
+    -fx-background-color: #1e3a5f;
+    background-color: #1e3a5f;
+}
+.file-message-other {
+    -fx-background-color: #3a3a3a;
+    background-color: #3a3a3a;
+}
+.download-button {
+    -fx-background-color: #00a884;
+    background-color: #00a884;
+}

@@ -16,7 +16,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 import model.Message;
@@ -175,6 +174,7 @@ public class MessageCell extends ListCell<Message> {
             contentLabel.setStyle("-fx-text-fill: black; -fx-font-size: 14px;");
             mainContainer.setAlignment(Pos.CENTER_LEFT);
         }
+        messageBubble.getStyleClass().add(message.isMine() ? "message-bubble-mine" : "message-bubble-other");
         
         mainContainer.getChildren().add(messageBubble);
         return mainContainer;

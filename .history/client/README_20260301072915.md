@@ -1,0 +1,10 @@
+# Client
+
+## Description
+Partie cliente du projet POO Avancée.
+
+## Installation
+```bash
+# Commandes d'installation spécifiques au client
+# Commandes d'utilisation
+# Liste des dépendances

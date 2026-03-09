@@ -1,2 +1,6 @@
 .history/
-#.vscode/
+allFiles/
+
+.vscode/tasks.json
+rename
+rename.cpp

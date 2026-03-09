@@ -169,19 +169,21 @@ public class UserListView extends BorderPane {
                 // Effet au survol
                 container.setOnMouseEntered(e -> {
                     if (!isSelected()) {
-                        container.setStyle("-fx-background-color: #f5f6f6; -fx-background-radius: 10;");
+                        container.getStyleClass().add("user-cell-hover");
                     }
                 });
                 
                 container.setOnMouseExited(e -> {
                     if (!isSelected()) {
-                        container.setStyle("-fx-background-color: transparent;");
+                        container.getStyleClass().remove("user-cell-hover");
                     }
                 });
                 
                 // Style pour l'élément sélectionné
                 if (isSelected()) {
-                    container.setStyle("-fx-background-color: #e8f0fe; -fx-background-radius: 10; -fx-border-color: #00a884; -fx-border-radius: 10; -fx-border-width: 1;");
+                    container.getStyleClass().add("user-cell-selected");
+                } else {
+                    container.getStyleClass().remove("user-cell-selected");
                 }
                 
                 setGraphic(container);

@@ -1,19 +1,40 @@
 package managerui;
 
-import ui.ChatView;
+import javafx.scene.Scene;
 
 public class Theme {
-    private static String currentTheme = "clair"; // clair ou sombre
+    private static Scene scene;
+    private static String currentTheme = "light"; // light ou dark
 
-    // ========== NOUVEAU : Appliquer le thème ==========
-    public static void applyTheme(ChatView chatView) {
-        // Récupérer le thème depuis les préférences (à implémenter)
-        // Pour l'instant, on utilise le thème clair par défaut
-        
-        if (currentTheme.equals("sombre")) {
-            // Thème sombre
-            chatView.setStyle("-fx-background-color: #1e1e1e;");
-            // Autres modifications de thème...
+    /**
+     * Enregistre la scène principale pour appliquer les feuilles de style.
+     */
+    public static void setScene(Scene scene) {
+        Theme.scene = scene;
+    }
+
+    /**
+     * Applique le thème spécifié en chargeant le fichier CSS correspondant.
+     * @param theme "light" ou "dark"
+     */
+    public static void apply(String theme) {
+        if (scene == null) return;
+
+        // Supprime les feuilles de style précédentes
+        scene.getStylesheets().removeIf(s -> s.contains("light") || s.contains("dark"));
+
+        // Ajoute la nouvelle feuille de style
+        String cssFile = "/style/" + theme + ".css";
+        try {
+            scene.getStylesheets().add(Theme.class.getResource(cssFile).toExternalForm());
+            currentTheme = theme;
+        } catch (Exception e) {
+            System.err.println("Impossible de charger le thème : " + cssFile);
+            e.printStackTrace();
         }
+    }
+
+    public static String getCurrentTheme() {
+        return currentTheme;
     }
 }

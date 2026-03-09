@@ -1,22 +1,9 @@
 package controller;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.ButtonType;
-import javafx.scene.media.AudioClip;
-import java.util.Optional;
-import java.io.File;
-import java.net.URL;
-
 import network.ChatClientConnection;
-import model.User;
-import model.Message;
-import model.MessageText;
-import model.MessageFile;
-// import ui.chatView1;
 import ui.ChatView;
 import managerui.*;
 
@@ -33,10 +20,11 @@ public class ChatClientFX extends Application {
         // ========== Créer la vue ==========
         chatView = new ChatView();
 
-        chatController1 = new ChatController(chatView, null, primaryStage);
+        chatController1 = new ChatController(chatView, primaryStage);
         
-        // ========== NOUVEAU : Appliquer le thème ==========
-        Theme.applyTheme(chatView);
+        // ========== Appliquer le thème ==========
+        Theme.setScene(primaryStage.getScene());
+        Theme.apply("dark");
         
         // 4. Afficher la fenêtre
         primaryStage.setScene(new Scene(chatView, 900, 600));
