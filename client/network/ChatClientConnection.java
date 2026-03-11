@@ -43,7 +43,7 @@ public class ChatClientConnection {
                 }
             }
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println(e.toString());
+            System.err.println(e.toString());
         }
     }
 

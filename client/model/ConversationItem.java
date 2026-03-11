@@ -2,8 +2,6 @@ package model;
 
 import java.time.LocalDateTime;
 
-import ui.ChatView.ConversationType;
-
 // Classe interne pour représenter un élément de conversation
 public class ConversationItem {
     private String id;

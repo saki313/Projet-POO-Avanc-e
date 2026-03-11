@@ -13,7 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import model.ConversationItem;
-import ui.ChatView.ConversationType;
+import model.ConversationType;
 
 public class ConversationCell extends ListCell<ConversationItem> {
     @Override

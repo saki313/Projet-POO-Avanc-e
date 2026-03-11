@@ -42,6 +42,7 @@ import model.MessageFile;
 import model.MessageText;
 import model.User;
 import model.ConversationItem;
+import model.ConversationType;
 
 public class ChatView extends BorderPane {
 
@@ -77,10 +78,6 @@ public class ChatView extends BorderPane {
     private Label onlineCountLabel;
     private Button settingsButton;
     
-    // Types de conversations
-    public enum ConversationType {
-        PUBLIC_GROUP, PRIVATE
-    }
     
     public ChatView() {
         conversations = FXCollections.observableArrayList();
@@ -112,16 +109,20 @@ public class ChatView extends BorderPane {
         headerBox.getStyleClass().add("left-header");
         
         Label appTitle = new Label("Discussions");
-        appTitle.setFont(Font.font("System", FontWeight.BOLD, 18));
+        appTitle.getStyleClass().add("tittle");
         
         Button newChatButton = new Button("➕");
         newChatButton.getStyleClass().add("icon-button");
         newChatButton.setTooltip(new Tooltip("Nouvelle discussion"));
-        
+        // TODO
+     // newChatButton.setOnAction(e -> action());  À implémenter plus tard
+
         Button menuButton = new Button("☰");
         menuButton.getStyleClass().add("icon-button");
         menuButton.setTooltip(new Tooltip("Menu"));
-        
+        // TODO
+     // menuChatButton.setOnAction(e -> action());  À implémenter plus tard
+
         // ========== MODIFICATION : Ajout du bouton paramètres ==========
         settingsButton = new Button("⚙️");
         settingsButton.getStyleClass().add("icon-button");
@@ -170,17 +171,17 @@ public class ChatView extends BorderPane {
         
         userListView = new UserListView();
         userListView.setPrefHeight(200);
-        userListView.setOnUserSelected(this::handleUserSelected);
+        userListView.setOnUserSelected(this::startPrivateConversation);
         
         VBox.setVgrow(conversationListView, Priority.NEVER);
         
         leftPanel.getChildren().addAll(
             headerBox, 
             searchBox, 
-            tabPane,
-            conversationListView,
-            contactsSeparator,
-            userListView
+            // tabPane, // À implémenter plus tard
+            conversationListView
+            // contactsSeparator,
+            // userListView
         );
         
         VBox.setVgrow(tabPane, Priority.ALWAYS);
@@ -203,6 +204,7 @@ public class ChatView extends BorderPane {
         centerPanel.setCenter(messageListView);
         
         VBox inputArea = createInputArea();
+        inputArea.getStyleClass().add("input-area");
         centerPanel.setBottom(inputArea);
         
         return centerPanel;
@@ -215,7 +217,7 @@ public class ChatView extends BorderPane {
         header.getStyleClass().add("chat-header");        
         
         conversationTitleLabel = new Label("Sélectionnez une conversation");
-        conversationTitleLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
+        conversationTitleLabel.getStyleClass().add("conversation-tittle");
         
         conversationStatusLabel = new Label("");
         conversationStatusLabel.setFont(Font.font(12));
@@ -401,41 +403,7 @@ public class ChatView extends BorderPane {
         // Si c'est la conversation courante, s'assurer que la ListView est mise à jour
         if (currentConversation != null && currentConversation.getId().equals(conversationId)) {
             messageListView.scrollTo(convMessages.size() - 1);
-        } else {
-            // Sinon, incrémenter le compteur de messages non lus
-            for (ConversationItem conv : conversations) {
-                if (conv.getId().equals(conversationId)) {
-                    conv.incrementUnreadCount();
-                    break;
-                }
-            }
         }
-    }
-
-    private void handleUserSelected(User selectedUser) {
-        String conversationId = "private_" + selectedUser.getName();
-        
-        ConversationItem privateConv = findPrivateConversation(selectedUser);
-        
-        if (privateConv == null) {
-            privateConv = new ConversationItem(conversationId, selectedUser.getName(), ConversationType.PRIVATE);
-            privateConv.setOtherUser(selectedUser);
-            conversations.add(privateConv);
-        }
-
-        conversationListView.getSelectionModel().select(privateConv);
-        selectConversation(privateConv);
-    }
-    
-    private ConversationItem findPrivateConversation(User user) {
-        for (ConversationItem conv : conversations) {
-            if (conv.getType() == ConversationType.PRIVATE && 
-                conv.getOtherUser() != null && 
-                conv.getOtherUser().getName().equals(user.getName())) {
-                return conv;
-            }
-        }
-        return null;
     }
     
     // ========== MÉTHODES PUBLIQUES ==========
@@ -446,12 +414,15 @@ public class ChatView extends BorderPane {
         
         MessageText message = new MessageText(text);
         
-        if (currentConversation != null) {
-            if (currentConversation.getType() == ConversationType.PRIVATE) {
-                message.setVisibility("private");
-            } else {
-                message.setVisibility("public");
-            }
+        if (currentConversation == null) {
+            System.out.println("Aucune conversation sélectionnée, message non envoyé");
+            return null;
+        }
+
+        if (currentConversation.getType() == ConversationType.PRIVATE) {
+            message.setVisibility("private");
+        } else {
+            message.setVisibility("public");
         }
         
         return message;
@@ -462,13 +433,11 @@ public class ChatView extends BorderPane {
     }
     
     public void addMessage(Message msg) {
-        /* if (currentConversation != null) {
+        if (currentConversation != null) {
             addMessageToConversation(currentConversation.getId(), msg);
         } else {
-            System.out.println("Message reçu mais aucune conversation active");
-        } */
-       // 
-       addMessageToConversation(currentConversation.getId(), msg);
+            System.out.println("addMessage appelé sans conversation active");
+        }
     }
     
     public void setOnSendAction(EventHandler<ActionEvent> handler) {
@@ -524,6 +493,7 @@ public class ChatView extends BorderPane {
         return conversationListView.getSelectionModel().getSelectedItem();
     }
     
+    // TODO : not used
     public void addConversation(ConversationItem conversation) {
         conversations.add(conversation);
     }
@@ -542,6 +512,7 @@ public class ChatView extends BorderPane {
         }
     }
    
+    // TODO : À implémenter plus tard
     public void setOnEmojiAction(EventHandler<ActionEvent> handler) {
         emojiButton.setOnAction(handler);
     }
@@ -566,14 +537,22 @@ public class ChatView extends BorderPane {
         onlineCountLabel.setText("👥 " + count + " en ligne");
     }
 
-    public ConversationItem getOrCreatePrivateConversation(String userId, User user) {
+    public void startPrivateConversation(User selectedUser) {
+        String conversationId = "private_" + selectedUser.getName();
+        ConversationItem privateConv = getOrCreatePrivateConversation(conversationId, selectedUser);
+
+        conversationListView.getSelectionModel().select(privateConv);
+        selectConversation(privateConv);
+    }
+
+    public ConversationItem getOrCreatePrivateConversation(String convId, User user) {
         for (ConversationItem conv : conversations) {
-            if (conv.getId().equals(userId)) {
+            if (conv.getId().equals(convId)) {
                 return conv;
             }
         }
-        ConversationItem newConv = new ConversationItem(userId, user.getName(), ConversationType.PRIVATE);
-        newConv.setOtherUser(new User(user.getName()));
+        ConversationItem newConv = new ConversationItem(convId, user.getName(), ConversationType.PRIVATE);
+        newConv.setOtherUser(user);
         conversations.add(newConv);
         return newConv;
     }
@@ -594,4 +573,6 @@ public class ChatView extends BorderPane {
     public ListView<ConversationItem> getConversationListView() {
         return conversationListView;
     }
+
+
 }

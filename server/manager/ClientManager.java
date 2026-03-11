@@ -1,67 +1,68 @@
 package manager;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 import model.Message;
-import model.MessageText;
 import model.User;
+import model.UserListMessage;
+import core.HandlerClient;
 
 public class ClientManager {
     // liste sync
-    private static Set<ObjectOutputStream> clients = Collections.synchronizedSet(new HashSet<>());
-    private static Map<ObjectOutputStream, User> objetClients = new HashMap<>();
+    private static Set<HandlerClient> clients = Collections.synchronizedSet(new HashSet<>());
+    // private static Map<ObjectOutputStream, User> objetClients = new HashMap<>();
 
     // add and remove user
-    public static void addUser(ObjectOutputStream out) {
-        clients.add(out);
+    public static void addUser(HandlerClient user) {
+        clients.add(user);
     }
-    public static void removeUser(ObjectOutputStream out) {
-        clients.remove(out);
+    public static void removeUser(HandlerClient user) {
+        clients.remove(user);
     }
 
     // diffusion
-    public static void broadcast(Message message, ObjectOutputStream sender) {
+    public static void broadcast(Message message, HandlerClient sender) {
         synchronized(clients) {
-            for (ObjectOutputStream client : clients) {
+            for (HandlerClient client : clients) {
                 if (client != sender) {
-                    try {
-                        client.writeObject(message);
-                    } catch (IOException e) {
-                        System.err.println(e.toString());
-                    }
+                    client.sendMessage(message);
                 }
             }
         }
     }
-    public static void annonce(String msg) {
-        String timestamp = LocalTime.now().toString().substring(0, 5);
-        String msgFormated = "📢 [" + timestamp + "] " + msg;
-
+    public static void annonce(Message msg) {
         synchronized(clients) {
-            for (ObjectOutputStream client : clients) {
-                try {
-                    client.writeObject(new MessageText(msgFormated));
-                    
-                } catch (Exception e) {
-                    System.err.println(e.toString());
-                }
+            for (HandlerClient client : clients) {
+                client.sendMessage(msg);
             }
         }
     }
+    public static void broadcastUserList(String msg) {
+        UserListMessage userListMsg = new UserListMessage(getConnectedUsers(), msg);
+        annonce(userListMsg);
+    }
 
+    public static List<User> getConnectedUsers() {
+        List<User> users = new ArrayList<>();
+        for (HandlerClient client : clients) {
+            if (client.getUser() != null) {
+                users.add(client.getUser());
+            }
+        }
+        return users;
+    }
+
+    public static void removeClient(HandlerClient client) {
+        clients.remove(client);
+        broadcast(new UserListMessage(getConnectedUsers()), null);
+    }
 
     // getters
-    public static Set<ObjectOutputStream> getClients() {
+    public static Set<HandlerClient> getClients() {
         return clients;
-    }
-    public static Map<ObjectOutputStream, User> getNomsClients() {
-        return objetClients;
     }
 }

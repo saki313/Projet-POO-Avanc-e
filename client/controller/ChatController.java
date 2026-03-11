@@ -1,6 +1,7 @@
 package controller;
 
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
 
 import javafx.application.Platform;
@@ -13,8 +14,10 @@ import model.Message;
 import model.MessageFile;
 import model.MessageText;
 import model.User;
+import model.UserListMessage;
 import network.ChatClientConnection;
 import ui.ChatView;
+import ui.UserListView;
 import managerui.XAlert;
 import managerui.XConnect;
 import managerui.Notification;
@@ -84,38 +87,23 @@ public class ChatController {
     
     public void updateTitle(String status) {
         Platform.runLater(() -> {
-            primaryStage.setTitle("Chat Application - " + user.getName() + " (" + status + ")");
+            primaryStage.setTitle("ChatX+ - " + user.getName() + " (" + status + ")");
         });
     }
     
-   /*  private void handleIncomingMessage(Message message) {
-        Platform.runLater(() -> {
-            boolean isFromMe = message.getSender().getName().equals(user.getName());
-            message.setMine(isFromMe);
-
-            String conversationId = null;
-            if (message instanceof MessageText || message instanceof MessageFile) {
-                if (message.getVisibility().equals("private")) {
-                    conversationId = isFromMe ? 
-                        chatView.getCurrentConversation().getId() : 
-                        "private_" + message.getSender().getName();
-                } else {
-                    conversationId = "public_group";
-                }
-            }
-            
-            if (conversationId != null) {
-                chatView.addMessageToConversation(conversationId, message);
-            }
-
-            if (!isFromMe) {
-                Notification.playSound(Notification.notificationSound);
-            }
-        });
-    }
- */
     private void handleIncomingMessage(Message message) {
     Platform.runLater(() -> {
+        // Traitement spécifique pour UserListMessage
+        if (message instanceof UserListMessage) {
+            UserListMessage ulm = (UserListMessage) message;
+            List<User> users = ulm.getUsers();
+            
+            UserListView userListView = chatView.getUserListView();
+            userListView.getUsers().setAll(users);
+            chatView.updateOnlineCount(users.size());
+            return;
+        }
+
         boolean isFromMe = message.getSender().getName().equals(user.getName());
         message.setMine(isFromMe);
 
@@ -141,8 +129,6 @@ public class ChatController {
             // S'assurer que la conversation existe
             if (conversationId.startsWith("private_")) {
                 chatView.getOrCreatePrivateConversation(conversationId, message.getSender());
-            } else if (isFromMe) {
-                return; // Ne pas recréer la conversation publique si elle existe déjà
             }
             chatView.addMessageToConversation(conversationId, message);
         } else {
@@ -175,16 +161,19 @@ public class ChatController {
         
         File selectedFile = chatView.chooseFile();
         if (selectedFile != null) {
-            if (selectedFile.length() > 10 * 1024 * 1024) {
+            if (selectedFile.length() > 10 * 1024 * 1024 * 1024) {
                 XAlert.showWarning("Fichier trop volumineux", 
-                           "Le fichier est trop volumineux (max 10MB)");
+                           "Le fichier est trop volumineux (max 10GB)");
                 return;
             }
             
             String fileName = selectedFile.getName();
             String extension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
             
-            String[] allowedExtensions = {"jpg", "jpeg", "png", "gif", "pdf", "txt", "doc", "docx", "mp3", "mp4"};
+            String[] allowedExtensions = {
+                "jpg", "jpeg", "png", "gif", "pdf", "txt",
+                "doc", "docx", "mp3", "mp4", "zip"         };
+
             boolean allowed = false;
             for (String ext : allowedExtensions) {
                 if (ext.equals(extension)) {
@@ -208,7 +197,7 @@ public class ChatController {
         }
     }
 
-    private void quitChat() {
+    public void quitChat() {
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle("Quitter le chat");
         alert.setHeaderText(null);
@@ -232,7 +221,7 @@ public class ChatController {
     }
 
     private void handleUserSelected(User selectedUser) {
-        // La vue gère déjà la création de la conversation
+        chatView.startPrivateConversation(selectedUser);
     }
 
     public User getUser() {

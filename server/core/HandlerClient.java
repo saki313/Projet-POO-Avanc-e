@@ -13,23 +13,23 @@ import model.User;
 
 public class HandlerClient implements Runnable {
     private Socket clientSocket;
-    private ObjectOutputStream out;
-    private ObjectInputStream in;
+    private ObjectOutputStream ops;
+    private ObjectInputStream ips;
     private User user;
 
-    public HandlerClient(Socket clientSocket, ObjectOutputStream out, ObjectInputStream in) {
+    public HandlerClient(Socket clientSocket) {
         this.clientSocket = clientSocket;
-        this.out = out;
-        this.in = in;
     }
 
     @Override
     public void run() {
         try {
-            // Ajouter ici
-            ClientManager.addUser(out);
-            user = (User) in.readObject();
-            
+            // Flux IO
+            ops = new ObjectOutputStream(clientSocket.getOutputStream());
+            ips = new ObjectInputStream(clientSocket.getInputStream());
+
+            user = (User) ips.readObject();
+
             // S'assurer que le nom n'est pas null
             if (user.getName() == null || user.getName().trim().isEmpty()) {
                 user.setName("Anonyme");
@@ -37,17 +37,13 @@ public class HandlerClient implements Runnable {
 
             // annoncer à tous qu'il s'est connecté
             int len = ClientManager.getClients().size();
-            User systemUser = new User("Système");
             String msg = user.getName() + " s'est connecté (" + len + " connecté" + (len>1? "s":"") + ")";
-            MessageText connectMsg = new MessageText(msg, systemUser);
-            
-            connectMsg.setVisibility("public");
-            ClientManager.broadcast(connectMsg, null);
+            ClientManager.broadcastUserList(msg);
             
             System.out.println(msg + " :: " + clientSocket.getInetAddress());
             
             while (true) {
-                Message message = (Message) in.readObject();
+                Message message = (Message) ips.readObject();
 
                 if (message instanceof MessageText msgText) {
                     System.out.println("Message reçu de " + msgText.getSender().getName() + ": " + msgText.getContent());
@@ -55,7 +51,7 @@ public class HandlerClient implements Runnable {
                     System.out.println("Fichier reçu de " + msgFile.getSender().getName() + ": " + msgFile.getFileName() + " (" + msgFile.getData().length + " bytes)");
                 }
 
-                ClientManager.broadcast(message, out);
+                ClientManager.broadcast(message, this);
             }
         } catch (IOException | ClassNotFoundException e) {
             System.err.println(e.toString());
@@ -64,12 +60,19 @@ public class HandlerClient implements Runnable {
         }
     }
 
-    private void closeConnection() {
-        ClientManager.getClients().remove(out);
+    public void sendMessage(Message message) {
+        try {
+            ops.writeObject(message);
+            ops.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
+    private void    closeConnection() {
         if (user != null) {
-            ClientManager.getNomsClients().remove(out);
-            ClientManager.annonce(user.getName() + " s'est connecté.");
+            ClientManager.getClients().remove(this);
+            ClientManager.broadcastUserList(user.getName() + " s'est connecté.");
             System.out.println("Un utilisateur vient de se déconnecter: " + clientSocket.getInetAddress());
         }
         try {
@@ -77,5 +80,9 @@ public class HandlerClient implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public User getUser() {
+        return user;
     }
 }

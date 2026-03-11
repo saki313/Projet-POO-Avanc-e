@@ -36,7 +36,7 @@ public class Notification {
         }
     }
 
-    // ========== NOUVEAU : Jouer un son ==========
+    // ========== Jouer un son ==========
     public static void playSound(AudioClip sound) {
         if (soundEnabled && sound != null) {
             sound.play();

@@ -8,6 +8,12 @@
     -fx-border-color: #3a3a3a;
     border-color: #3a3a3a;
 }
+.left-header {
+    -fx-background-color: #2d2d2d;
+    background-color: #2d2d2d;
+    -fx-border-color: #3a3a3a;
+    border-color: #3a3a3a;
+}
 .center-panel {
     -fx-background-color: #262626;
     background-color: #262626;
@@ -17,6 +23,12 @@
     background-color: #2d2d2d;
     -fx-border-color: #3a3a3a;
     border-color: #3a3a3a;
+}
+.tittle {
+    -fx-text-fill: white;
+    font-size: 25;
+    size: 30;
+    font-weight: bold;
 }
 .icon-button {
     -fx-background-color: transparent;
@@ -32,7 +44,15 @@
     -fx-background-color: #2d2d2d;
     background-color: #2d2d2d;
 }
-.conversation-list, .user-listview, .message-list {
+.conversation-list {
+    -fx-background-color: #2d2d2d;
+    background-color: #2d2d2d;
+}
+.user-listview {
+    -fx-background-color: #2d2d2d;
+    background-color: #2d2d2d;
+}
+.message-list {
     -fx-background-color: #2d2d2d;
     background-color: #2d2d2d;
 }
@@ -81,6 +101,10 @@
     background-color: #00a884;
 }
 .input-area {
+    -fx-background-color: #2d2d2d;
+    background-color: #2d2d2d;
+}
+.message-input {
     -fx-background-color: #2d2d2d;
     background-color: #2d2d2d;
 }
@@ -158,4 +182,74 @@
 .download-button {
     -fx-background-color: #00a884;
     background-color: #00a884;
+}
+.conversation-status {
+    -fx-text-fill: #a0a0a0;
+}
+.conversation-tittle {
+    -fx-text-fill: white;
+    font-size: 22px;
+    font-weight: bold;
+}
+/*
+.send-button {    -fx-background-color: #0078FF;
+    background-color: #0078FF;
+    -fx-text-fill: white;
+    -fx-font-size: 20;
+    font-size: 20;
+    -fx-background-radius: 20;
+    -fx-padding: 8 15;
+    padding: 8 15;
+}
+.quit-button {    -fx-background-color: #dc3545;
+    background-color: #dc3545;
+    -fx-text-fill: white;
+    -fx-font-size: 20;
+    font-size: 20;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-background-radius: 20;
+    -fx-padding: 8 15;
+    padding: 8 15;
+}
+.emoji-button {    -fx-background-color: #3a3a3a;
+    background-color: #3a3a3a;
+    -fx-text-fill: white;
+    -fx-font-size: 20;
+    font-size: 20;
+    -fx-background-radius: 20;
+    -fx-padding: 8 12;
+    padding: 8 12;
+    -fx-border-color: #555;
+    border-color: #555;
+}
+.file-button {    -fx-background-color: rgba(0,168,132,0.2);
+    background-color: rgba(0,168,132,0.2);
+    -fx-text-fill: white;
+    -fx-font-size: 20;
+    font-size: 20;
+    -fx-background-radius: 20;
+    -fx-padding: 8 12;
+    padding: 8 12;
+}
+.input-field {    -fx-background-color: #3a3a3a;
+    background-color: #3a3a3a;
+    -fx-text-fill: white;
+    -fx-background-radius: 20;
+    -fx-padding: 8 15;
+    padding: 8 15;
+}
+*/
+.info-button {
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-text-fill: #00a884;
+}
+.info-button:hover {
+    -fx-text-fill: #00a884;
+    -fx-underline: true;
+}
+.info-button:pressed {
+    -fx-text-fill: #00a884;
+    -fx-underline: true;
 }

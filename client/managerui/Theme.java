@@ -4,7 +4,7 @@ import javafx.scene.Scene;
 
 public class Theme {
     private static Scene scene;
-    private static String currentTheme;
+    private static String currentTheme = "light";
 
     public static void setScene(Scene scene) {
         Theme.scene = scene;

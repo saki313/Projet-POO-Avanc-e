@@ -13,7 +13,14 @@
     -fx-border-width: 0 1 0 0;
     border-width: 0 1 0 0;
 }
-
+.left-header {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-border-color: #e9edef;
+    border-color: #e9edef;
+    -fx-border-width: 0 0 1 0;
+    border-width: 0 0 1 0;
+}
 .center-panel {
     -fx-background-color: #efeae2;
     background-color: #efeae2;
@@ -28,7 +35,12 @@
     -fx-border-width: 0 0 1 0;
     border-width: 0 0 1 0;
 }
-
+.tittle {
+    -fx-text-fill: black;
+    font-size: 25;
+    font-weight: bold;
+    size: 15cm;
+}
 .conversation-header {
     -fx-background-color: #f0f2f5;
     background-color: #f0f2f5;
@@ -199,6 +211,10 @@
 
 /* Zone de saisie */
 .input-area {
+    -fx-background-color: #f0f2f5;
+    background-color: #f0f2f5;
+}
+.message-input {
     -fx-background-color: #f0f2f5;
     background-color: #f0f2f5;
 }
@@ -373,6 +389,29 @@
     padding: 5 15;
     -fx-cursor: hand;
     cursor: hand;
+    -fx-font-size: 11px;
+    font-size: 11px;
+}
+.conversation-status {
+    -fx-text-fill: #667781;
+    -fx-font-size: 11px;
+    font-size: 11px;
+}
+.conversation-status-online {
+    -fx-text-fill: #00a884;
+}
+.conversation-status-offline {
+    -fx-text-fill: #dc3545;
+}
+.conversation-tittle {
+    -fx-text-fill: black;
+    font-size: 22px;
+    font-weight: bold;
+}
+.info-button {
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-text-fill: #667781;
     -fx-font-size: 11px;
     font-size: 11px;
 }

@@ -1,10 +1,10 @@
 package core;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import manager.ClientManager;
 
 public class ChatServer {
     private static final int PORT = 12345;
@@ -16,14 +16,9 @@ public class ChatServer {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
 
-                // Flux IO
-                ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
-                ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
-
-                // pourquoi ne pas directement ajouter à ce niveau
-                // clients.add(out);
-                new Thread(new core.HandlerClient(clientSocket,out, in)).start();
-
+                HandlerClient handler = new core.HandlerClient(clientSocket);
+                ClientManager.addUser(handler);
+                new Thread(handler).start();
             }
         } catch (IOException e) {
             System.out.println("Erreur serveur: " + e.getMessage());

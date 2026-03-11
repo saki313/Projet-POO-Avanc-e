@@ -105,6 +105,7 @@ public class UserListView extends BorderPane {
         return listView;
     }
     
+    // TODO : not used ; suppress
     private void updateCount() {
         int total = users.size();
         int displayed = filteredUsers.size();
@@ -185,25 +186,29 @@ public class UserListView extends BorderPane {
     
     // ========== MÉTHODES PUBLIQUES ==========
     
+    // TODO : not used
     public User getSelectedUser() {
         return userList.getSelectionModel().getSelectedItem();
     }
     
+    // TODO : not used
     public void addUser(User user) {
         users.add(user);
         updateCount();
     }
     
+    // TODO : not used
     public void addUser(String username) {
         users.add(new User(username));
         updateCount();
     }
     
+    // TODO : not used
     public void removeUser(String username) {
         users.removeIf(user -> user.getName().equals(username));
         updateCount();
     }
-    
+    // TODO : not used
     public void removeUser(User user) {
         users.remove(user);
         updateCount();
@@ -225,6 +230,7 @@ public class UserListView extends BorderPane {
         return users;
     }
     
+    // TODO : not used
     public void resetSearch() {
         searchField.clear();
     }

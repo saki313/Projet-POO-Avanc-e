@@ -3,5 +3,4 @@ public class ServerMain {
     public static void main(String[] args) {
         core.ChatServer.main(args);
     }
-
 }
