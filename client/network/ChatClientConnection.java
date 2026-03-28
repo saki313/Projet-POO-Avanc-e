@@ -22,12 +22,15 @@ public class ChatClientConnection {
     public void connect(String host, int port, User user) {
         try {
             socket = new Socket(host, port);
+
             in = new ObjectInputStream(socket.getInputStream());
             out = new ObjectOutputStream(socket.getOutputStream());
+
             out.writeObject(user);
             new Thread(this::listen).start();
         } catch (IOException e) {
-            System.out.println(e.toString());
+            System.err.println(e.toString());
+            e.printStackTrace();
         }
     }
 

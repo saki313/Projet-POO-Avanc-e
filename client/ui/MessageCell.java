@@ -7,11 +7,28 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.FileChooser;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import java.io.File;
+import java.nio.file.Files;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import model.Message;
 import model.MessageFile;
 import model.MessageText;
 
 public class MessageCell extends ListCell<Message> {
+
+    private boolean isPrivateConversation = false;
+    
+    private LocalDate lastMessageDate = null;
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     @Override
     protected void updateItem(Message message, boolean empty) {
@@ -20,94 +37,238 @@ public class MessageCell extends ListCell<Message> {
         if (empty || message == null) {
             setText(null);
             setGraphic(null);
+            lastMessageDate = null;
             return;
         }
         
+        Object typeProp = getListView().getProperties().get("conversationType");
+        if (typeProp instanceof Boolean) {
+            this.isPrivateConversation = (Boolean) typeProp;
+        }
+        
+        VBox container = new VBox();
+        
+        LocalDate messageDate = message.getTimestamp().toLocalDate();
+        if (lastMessageDate == null || !lastMessageDate.equals(messageDate)) {
+            container.getChildren().add(createDateSeparator(messageDate));
+            lastMessageDate = messageDate;
+        }
+        
         if (message instanceof MessageText) {
-            showTextMessage((MessageText) message);
+            container.getChildren().add(createTextMessageContent((MessageText) message));
         } else if (message instanceof MessageFile) {
-            showFileMessage((MessageFile) message);
+            container.getChildren().add(createFileMessageContent((MessageFile) message));
         } else {
             setText("Message inconnu");
+            return;
         }
+        
+        setGraphic(container);
     }
     
-    private void showTextMessage(MessageText message) {
-        VBox container = new VBox(5);
-        container.setPadding(new Insets(5));
+    private HBox createDateSeparator(LocalDate date) {
+        HBox separator = new HBox();
+        separator.setAlignment(Pos.CENTER);
+        separator.setPadding(new Insets(10, 0, 10, 0));
         
-        Label sender = new Label(message.getSender().getName());
-        sender.setStyle("-fx-font-weight: bold; -fx-font-size: 10px;");
+        Label dateLabel = new Label(date.format(DATE_FORMATTER));
+        dateLabel.getStyleClass().add("date-separator");
+        
+        separator.getChildren().add(dateLabel);
+        return separator;
+    }
+    
+    private HBox createTextMessageContent(MessageText message) {
+        HBox mainContainer = new HBox();
+        mainContainer.setPadding(new Insets(5, 10, 5, 10));
+        
+        VBox messageBubble = new VBox(3);
+        messageBubble.setMaxWidth(350);
+        messageBubble.getStyleClass().add(message.isMine() ? "message-bubble-mine" : 
+            (isPrivateConversation ? "message-bubble-other-private" : "message-bubble-other-group"));
+        
+        if (!message.isMine() && !isPrivateConversation) {
+            Label senderLabel = new Label(message.getSender().getName());
+            senderLabel.setFont(Font.font("System", FontWeight.BOLD, 11));
+            senderLabel.getStyleClass().add("message-sender");
+            senderLabel.setPadding(new Insets(0, 0, 0, 8));
+            messageBubble.getChildren().add(senderLabel);
+        }
         
         Label contentLabel = new Label(message.getContent());
         contentLabel.setWrapText(true);
         contentLabel.setMaxWidth(300);
-        
-        String timeStr = String.format("%02d:%02d", 
-            message.getTimestamp().getHour(), 
-            message.getTimestamp().getMinute());
-        Label hour = new Label(timeStr);
-        hour.setStyle("-fx-font-size: 8px; -fx-text-fill: gray;");
-
-        container.getChildren().addAll(sender, contentLabel, hour);
-        container.setAlignment(message.isMine() ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
-
         contentLabel.setPadding(new Insets(8, 12, 8, 12));
+        contentLabel.setFont(Font.font(14));
+        contentLabel.getStyleClass().add(message.isMine() ? "message-text-mine" : "message-text-other");
         
-        // Style de bulle amélioré
+        String timeStr = message.getTimestamp().format(TIME_FORMATTER);
+        Label hourLabel = new Label(timeStr);
+        hourLabel.setFont(Font.font(10));
+        hourLabel.getStyleClass().add("message-time");
+        hourLabel.setPadding(new Insets(0, 4, 2, 0));
+        
+        HBox footerBox = new HBox(5);
+        footerBox.setAlignment(Pos.CENTER_RIGHT);
+        
         if (message.isMine()) {
-            contentLabel.setStyle("-fx-background-color: #0078FF; -fx-text-fill: white; " +
-                "-fx-background-radius: 15 15 0 15; -fx-font-size: 14px;");
-            container.setAlignment(Pos.CENTER_RIGHT);
-        } else {
-            contentLabel.setStyle("-fx-background-color: #E9E9EB; -fx-text-fill: black; " +
-                "-fx-background-radius: 15 15 15 0; -fx-font-size: 14px;");
-            container.setAlignment(Pos.CENTER_LEFT);
+            String status = getMessageStatus(message);
+            Label statusLabel = new Label(status);
+            statusLabel.setFont(Font.font(12));
+            statusLabel.getStyleClass().add(status.equals("✓✓") ? "status-read" : "status-sent");
+            footerBox.getChildren().add(statusLabel);
         }
-
-        setGraphic(container);
+        
+        footerBox.getChildren().add(hourLabel);
+        messageBubble.getChildren().addAll(contentLabel, footerBox);
+        
+        mainContainer.setAlignment(message.isMine() ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+        mainContainer.getChildren().add(messageBubble);
+        
+        return mainContainer;
     }
-   
-    private void showFileMessage(MessageFile message) {
-        VBox container = new VBox(5);
-        container.setPadding(new Insets(5));
+    
+    private HBox createFileMessageContent(MessageFile message) {
+        HBox mainContainer = new HBox();
+        mainContainer.setPadding(new Insets(5, 10, 5, 10));
         
-        Label sender = new Label(message.getSender().getName());
-        sender.setStyle("-fx-font-weight: bold; -fx-font-size: 10px;");
+        VBox messageBubble = new VBox(5);
+        messageBubble.setMaxWidth(350);
+        messageBubble.setPadding(new Insets(10));
+        messageBubble.getStyleClass().add(message.isMine() ? "file-message-mine" : 
+            (isPrivateConversation ? "file-message-other-private" : "file-message-other-group"));
         
-        HBox fileBox = new HBox(10);
+        if (!message.isMine() && !isPrivateConversation) {
+            Label senderLabel = new Label(message.getSender().getName());
+            senderLabel.setFont(Font.font("System", FontWeight.BOLD, 11));
+            senderLabel.getStyleClass().add("message-sender");
+            messageBubble.getChildren().add(senderLabel);
+        }
+        
+        HBox fileBox = new HBox(12);
         fileBox.setAlignment(Pos.CENTER_LEFT);
         
-        Label fileName = new Label("📄 " + message.getFileName());
-        fileName.setStyle("-fx-font-size: 14px;");
+        String icon = getFileIcon(message.getFileName());
+        Label iconLabel = new Label(icon);
+        iconLabel.setFont(Font.font(24));
+        
+        VBox fileInfo = new VBox(3);
+        
+        Label fileNameLabel = new Label(message.getFileName());
+        fileNameLabel.setFont(Font.font("System", FontWeight.BOLD, 13));
+        fileNameLabel.setWrapText(true);
+        fileNameLabel.setMaxWidth(200);
+        
+        long fileSize = (message.getData() != null) ? message.getData().length : 0;
+        Label fileSizeLabel = new Label(formatFileSize(fileSize));
+        fileSizeLabel.setFont(Font.font(11));
+        fileSizeLabel.getStyleClass().add("file-size");
+        
+        fileInfo.getChildren().addAll(fileNameLabel, fileSizeLabel);
+        fileBox.getChildren().addAll(iconLabel, fileInfo);
         
         Button downloadButton = new Button("⬇ Télécharger");
-        downloadButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+        downloadButton.getStyleClass().add("download-button");
+        downloadButton.setFont(Font.font(11));
         
-        // Action de téléchargement
         downloadButton.setOnAction(e -> {
-            // TODO: Implémenter le téléchargement du fichier
-            System.out.println("Téléchargement de: " + message.getFileName());
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Enregistrer le fichier");
+            fileChooser.setInitialFileName(message.getFileName());
+            
+            String extension = "";
+            int lastDot = message.getFileName().lastIndexOf('.');
+            if (lastDot > 0) {
+                extension = message.getFileName().substring(lastDot + 1);
+                fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("Fichiers " + extension.toUpperCase(), "*." + extension)
+                );
+            }
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Tous les fichiers", "*.*"));
+            
+            File saveFile = fileChooser.showSaveDialog(getScene().getWindow());
+            
+            if (saveFile != null) {
+                try {
+                    Files.write(saveFile.toPath(), message.getData());
+                    
+                    Alert alert = new Alert(AlertType.INFORMATION);
+                    alert.setTitle("Téléchargement réussi");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Fichier enregistré : " + saveFile.getName());
+                    alert.showAndWait();
+                    
+                } catch (Exception ex) {
+                    Alert alert = new Alert(AlertType.ERROR);
+                    alert.setTitle("Erreur");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Impossible de sauvegarder le fichier : " + ex.getMessage());
+                    alert.showAndWait();
+                    ex.printStackTrace();
+                }
+            }
         });
         
-        fileBox.getChildren().addAll(fileName, downloadButton);
+        String timeStr = message.getTimestamp().format(TIME_FORMATTER);
         
-        String timeStr = String.format("%02d:%02d", 
-            message.getTimestamp().getHour(), 
-            message.getTimestamp().getMinute());
-        Label hour = new Label(timeStr);
-        hour.setStyle("-fx-font-size: 8px; -fx-text-fill: gray;");
+        HBox footerBox = new HBox(5);
+        footerBox.setAlignment(Pos.CENTER_RIGHT);
         
-        container.getChildren().addAll(sender, fileBox, hour);
-        container.setAlignment(message.isMine() ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
-        
-        // Style pour les fichiers
         if (message.isMine()) {
-            container.setStyle("-fx-background-color: #e3f2fd; -fx-background-radius: 10;");
-        } else {
-            container.setStyle("-fx-background-color: #f5f5f5; -fx-background-radius: 10;");
+            String status = getMessageStatus(message);
+            Label statusLabel = new Label(status);
+            statusLabel.setFont(Font.font(12));
+            statusLabel.getStyleClass().add(status.equals("✓✓") ? "status-read" : "status-sent");
+            footerBox.getChildren().add(statusLabel);
         }
-
-        setGraphic(container);
+        
+        Label hourLabel = new Label(timeStr);
+        hourLabel.setFont(Font.font(10));
+        hourLabel.getStyleClass().add("message-time");
+        footerBox.getChildren().add(hourLabel);
+        
+        messageBubble.getChildren().addAll(fileBox, downloadButton, footerBox);
+        
+        mainContainer.setAlignment(message.isMine() ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+        mainContainer.getChildren().add(messageBubble);
+        
+        return mainContainer;
+    }
+    
+    private String getMessageStatus(Message message) {
+        long minutesDiff = java.time.Duration.between(message.getTimestamp(), LocalDateTime.now()).toMinutes();
+        return minutesDiff > 1 ? "✓✓" : "✓";
+    }
+    
+    private String getFileIcon(String fileName) {
+        if (fileName == null || fileName.isEmpty()) return "📄";
+        
+        String extension = "";
+        int lastDot = fileName.lastIndexOf('.');
+        if (lastDot > 0) {
+            extension = fileName.substring(lastDot + 1).toLowerCase();
+        }
+        
+        switch (extension) {
+            case "pdf": return "📕";
+            case "jpg": case "jpeg": case "png": case "gif": case "bmp": return "🖼️";
+            case "mp3": case "wav": case "ogg": case "flac": return "🎵";
+            case "mp4": case "avi": case "mov": case "mkv": return "🎬";
+            case "zip": case "rar": case "7z": return "📦";
+            case "doc": case "docx": return "📝";
+            case "xls": case "xlsx": return "📊";
+            case "ppt": case "pptx": return "📽️";
+            case "txt": return "📃";
+            default: return "📄";
+        }
+    }
+    
+    private String formatFileSize(long size) {
+        if (size < 0) return "Taille inconnue";
+        if (size == 0) return "Fichier vide";
+        if (size < 1024) return size + " o";
+        if (size < 1024 * 1024) return String.format("%.1f Ko", size / 1024.0);
+        if (size < 1024 * 1024 * 1024) return String.format("%.1f Mo", size / (1024.0 * 1024.0));
+        return String.format("%.2f Go", size / (1024.0 * 1024.0 * 1024.0));
     }
 }
